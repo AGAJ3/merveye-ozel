@@ -17,7 +17,7 @@ st.caption(f"{SENIN_ADIN} Tarfından {SEVGILININ_ADI} için hazırlandı. Ne sor
 api_key = st.secrets.get("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("Aşkım sistemde bir sorun var, Murat'a söyle API anahtarını girsin.")
+    st.error("Bir sorun var, Murat'a haber ver hemen düzeltsin.")
     st.stop()
 
 genai.configure(api_key=api_key)
@@ -48,7 +48,7 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
     with st.chat_message("assistant"):
         try:
             model = genai.GenerativeModel(
-                model_name="gemini-2.5-flash",
+                model_name="gemini-3.6-flash",
                 system_instruction=SYSTEM_PROMPT
             )
             
