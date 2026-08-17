@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import time
 
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
@@ -11,7 +12,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- MURAT İÇİN GİZLİ KENAR ÇUĞUĞU (ŞİFRELİ) ---
+# --- MURAT İÇİN GİZLİ KENAR ÇUĞUĞU (ŞİFRELİ & CANLI AKIŞLI) ---
 with st.sidebar:
     st.markdown("### 🕵️‍♂️ Murat'ın Paneli")
     sifre_giris = st.text_input("Gizli Şifre:", type="password")
@@ -30,6 +31,11 @@ with st.sidebar:
                     st.markdown(f"**Sanal Murat:** {m['content']}")
         else:
             st.info("Henüz kimse bir şey yazmadı.")
+            
+        # Paneli açık tuttuğun sürece her 5 saniyede bir ekranı otomatik günceller
+        time.sleep(5)
+        st.rerun()
+        
     elif sifre_giris != "":
         st.error("Yanlış şifre!")
 
