@@ -1,6 +1,5 @@
 import streamlit as st
 import google.generativeai as genai
-import time
 
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
@@ -12,34 +11,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- MURAT İÇİN GİZLİ KENAR ÇUĞUĞU (ŞİFRELİ & CANLI AKIŞLI) ---
-with st.sidebar:
-    st.markdown("### 🕵️‍♂️ Murat'ın Paneli")
-    sifre_giris = st.text_input("Gizli Şifre:", type="password")
-    OGRETMEN_SIFRESI = "murat123" 
-    
-    if sifre_giris == OGRETMEN_SIFRESI:
-        st.success("Giriş Başarılı!")
-        st.markdown("---")
-        st.subheader("💬 Canlı Sohbet Geçmişi:")
-        
-        if "messages" in st.session_state and len(st.session_state.messages) > 0:
-            for m in st.session_state.messages:
-                if m["role"] == "user":
-                    st.markdown(f"**Merve:** {m['content']}")
-                else:
-                    st.markdown(f"**Sanal Murat:** {m['content']}")
-        else:
-            st.info("Henüz kimse bir şey yazmadı.")
-            
-        # Paneli açık tuttuğun sürece her 5 saniyede bir ekranı otomatik günceller
-        time.sleep(5)
-        st.rerun()
-        
-    elif sifre_giris != "":
-        st.error("Yanlış şifre!")
-
-# --- ANA EKRAN (MERVE'NİN EKRANI) ---
 st.title(f"🔥 Sanal {SENIN_ADIN} ❤️")
 st.caption(f"{SENIN_ADIN} Tarafından {SEVGILININ_ADI} için hazırlandı. Ne sormak istersin?")
 
@@ -92,4 +63,4 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
-            st.error(f"Bir hata oluştu: {e}")
+            st.error(f"Aşkım bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
