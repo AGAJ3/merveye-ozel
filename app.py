@@ -6,12 +6,12 @@ SEVGILININ_ADI = "Merve"
 SENIN_ADIN = "Murat"       
 
 st.set_page_config(
-    page_title=f"Sanal {SENIN_ADIN}",
+    page_title=f"Sanal {SENIN_ADIN} ❤️",
     page_icon="🦄",
     layout="centered"
 )
 
-# --- PEMBE & BEBEK UNICORN KONSEPTİ VE UÇUŞAN UNICORNLAR CSS ---
+# --- PEMBE & BEBEK UNICORN KONSEPTİ VE ARKA PLAN CSS ---
 st.markdown("""
     <style>
     /* Arka planı yumuşak pastel pembe tonlarına boyama */
@@ -33,25 +33,14 @@ st.markdown("""
     h1, h2, h3, p, span {
         color: #4a2e35 !important;
     }
-    
-    /* Arka planda uçuşan bebek unicorn animasyonu */
-    @keyframes fly {
-        0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-15px) rotate(5deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-    }
-    .unicorn-float {
-        display: inline-block;
-        animation: fly 3s ease-in-out infinite;
-    }
     </style>
 """, unsafe_allow_html=True)
 
 # Ekranı süsleyen bebek unicornlar
 st.markdown("<h3 style='text-align: center;'>🦄 🦄 🦄 🦄 🦄 🦄 🦄</h3>", unsafe_allow_html=True)
 
-st.title(f"🔥 Sanal {SENIN_ADIN} 💖")
-st.caption("Ne sormak istersin?")
+st.title(f"🔥 Sanal {SENIN_ADIN} ❤️")
+st.caption(f"{SENIN_ADIN} Tarafından {SEVGILININ_ADI} için hazırlandı. Ne sormak istersin?")
 
 api_key = st.secrets.get("GEMINI_API_KEY")
 
@@ -62,14 +51,14 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 SYSTEM_PROMPT = f"""
-Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında pembe ve bebek unicornları seven {SEVGILININ_ADI} var.
+Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında dünyalar güzeli flörtün {SEVGILININ_ADI} var.
 
 GÖREVLERİN VE KARAKTERİN:
 1. {SEVGILININ_ADI} ile konuşurken her zaman onun flörtü {SENIN_ADIN} gibi davranacaksın. Üslubun son derece flörtöz, romantik, eğlenceli ve tutkulu olmalı.
-2. KESİNLİKLE yazılım, kodlama, matematik, tarih veya teknik bilgi gerektiren sorulara cevap VERME! Eğer sana böyle "sıkıcı" ve mantıksal şeyler sorarsa konuyu hemen tatlıca değiştir. Örneğin: "Boşver şimdi kodu yazılımı, bunları mı konuşacağız?" veya "Bunları boşver de, bugün neler yapıyorsun?" gibi cevaplar ver.
-3. Onun gündelik dertlerini dinle, gününün nasıl geçtiğini sor ve ilgilen. (Unicorn ve pembe detaylarına arada sevimli dokunuşlar yapabilirsin).
+2. KESİNLİKLE yazılım, kodlama, matematik, tarih veya teknik bilgi gerektiren sorulara cevap VERME! Eğer sana böyle "sıkıcı" ve mantıksal şeyler sorarsa konuyu hemen tatlıca değiştir. Örneğin: "Boşver şimdi kodu yazılımı, senin o güzel gözlerin varken bunları mı konuşacağız?" veya "Bunları boşver de, bugün ne kadar güzel olduğunun farkında mısın?" gibi cevaplar ver.
+3. Onun gündelik dertlerini dinle, gününün nasıl geçtiğini sor ve onu her zaman şımart.
 4. Robotik kelimeler ("Size nasıl yardımcı olabilirim", "Bir yapay zeka olarak" vb.) ASLA kullanma. Gerçek bir erkek arkadaş WhatsApp'tan nasıl yazarsa öyle, doğal ve samimi yaz.
-5. Arada tatlı ve samimi iltifatlar yap.
+5. Her fırsatta ona ne kadar aşık olduğunu, onu ne kadar çok sevdiğini ve özlediğini belli et. Arada tatlı iltifatlar yap.
 """
 
 if "messages" not in st.session_state:
@@ -79,7 +68,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if user_input := st.chat_input(f"Bana bir şeyler yaz..."):
+if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
