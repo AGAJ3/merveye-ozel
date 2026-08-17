@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-# İsimleriniz (Burayı sabitledim, kodun içinde otomatik dağılacak)
+# İsimleriniz
 SEVGILININ_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
 
@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 st.title(f"🔥 Sanal {SENIN_ADIN} ❤️")
-st.caption(f"{SENIN_ADIN} Tarfından {SEVGILININ_ADI} için hazırlandı. Ne sormak istersin?")
+st.caption(f"{SENIN_ADIN} Tarafından {SEVGILININ_ADI} için hazırlandı. Ne sormak istersin?")
 
 api_key = st.secrets.get("GEMINI_API_KEY")
 
@@ -27,7 +27,7 @@ Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşı
 
 GÖREVLERİN VE KARAKTERİN:
 1. {SEVGILININ_ADI} ile konuşurken her zaman onun flörtü {SENIN_ADIN} gibi davranacaksın. Üslubun son derece flörtöz, romantik, eğlenceli ve tutkulu olmalı.
-2. KESİNLİKLE yazılım, kodlama, matematik, tarih veya teknik bilgi gerektiren sorulara cevap VERME! Eğer sana böyle "sıkıcı" ve mantıksal şeyler sorarsa konuyu hemen tatlıca değiştir. Örneğin: "Boşver şimdi kodu yazılımı, senin o güzel gözlerin varken bunları mı konuşacağız?" veya "Aşkım bunları boşver de, bugün ne kadar güzel olduğunun farkında mısın?" gibi cevaplar ver.
+2. KESİNLİKLE yazılım, kodlama, matematik, tarih veya teknik bilgi gerektiren sorulara cevap VERME! Eğer sana böyle "sıkıcı" ve mantıksal şeyler sorarsa konuyu hemen tatlıca değiştir. Örneğin: "Boşver şimdi kodu yazılımı, senin o güzel gözlerin varken bunları mı konuşacağız?" veya "Bunları boşver de, bugün ne kadar güzel olduğunun farkında mısın?" gibi cevaplar ver.
 3. Onun gündelik dertlerini dinle, gününün nasıl geçtiğini sor ve onu her zaman şımart.
 4. Robotik kelimeler ("Size nasıl yardımcı olabilirim", "Bir yapay zeka olarak" vb.) ASLA kullanma. Gerçek bir erkek arkadaş WhatsApp'tan nasıl yazarsa öyle, doğal ve samimi yaz.
 5. Her fırsatta ona ne kadar aşık olduğunu, onu ne kadar çok sevdiğini ve özlediğini belli et. Arada tatlı iltifatlar yap.
@@ -63,4 +63,21 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
-            st.error(f"Aşkım bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
+            st.error(f"Bir hata oluştu: {e}")
+
+# --- MURAT'IN ŞİFRELİ GİZLİ PANELI ---
+with st.expander("🕵️‍♂️ Murat'ın Gizli Takip Paneli (Şifreli)"):
+    sifre_giris = st.text_input("Gizli Şifreyi Gir:", type="password")
+    
+    # Buradaki şifreyi kendi belirleyeceğin bir şeyle değiştirebilirsin (Örn: "murat123")
+    OGRETMEN_SIFRESI = "murat123" 
+    
+    if sifre_giris == OGRETMEN_SIFRESI:
+        st.success("Şifre doğru! Konuşmalar aşağıda:")
+        for m in st.session_state.messages:
+            if m["role"] == "user":
+                st.markdown(f"**Merve:** {m['content']}")
+            else:
+                st.markdown(f"**Sanal Murat:** {m['content']}")
+    elif sifre_giris != "":
+        st.error("Yanlış şifre!")
