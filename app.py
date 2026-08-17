@@ -6,12 +6,12 @@ SEVGILININ_ADI = "Merve"
 SENIN_ADIN = "Murat"       
 
 st.set_page_config(
-    page_title=f"Sanal {SENIN_ADIN} & {SEVGILININ_ADI}",
+    page_title=f"Sanal {SENIN_ADIN}",
     page_icon="🦄",
     layout="centered"
 )
 
-# --- PEMBE & BEBEK UNICORN KONSEPTİ CSS STİLLERİ ---
+# --- PEMBE & BEBEK UNICORN KONSEPTİ VE UÇUŞAN UNICORNLAR CSS ---
 st.markdown("""
     <style>
     /* Arka planı yumuşak pastel pembe tonlarına boyama */
@@ -33,11 +33,25 @@ st.markdown("""
     h1, h2, h3, p, span {
         color: #4a2e35 !important;
     }
+    
+    /* Arka planda uçuşan bebek unicorn animasyonu */
+    @keyframes fly {
+        0% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+        100% { transform: translateY(0px) rotate(0deg); }
+    }
+    .unicorn-float {
+        display: inline-block;
+        animation: fly 3s ease-in-out infinite;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-st.title(f"🦄 Sanal {SENIN_ADIN} & {SEVGILININ_ADI} 💖")
-st.caption(f"{SEVGILININ_ADI} için hazırlandı. Bakalım Murat sana neler söylecek?")
+# Ekranı süsleyen bebek unicornlar
+st.markdown("<h3 style='text-align: center;'>🦄 🦄 🦄 🦄 🦄 🦄 🦄</h3>", unsafe_allow_html=True)
+
+st.title(f"🔥 Sanal {SENIN_ADIN} 💖")
+st.caption("Ne sormak istersin?")
 
 api_key = st.secrets.get("GEMINI_API_KEY")
 
@@ -65,7 +79,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
+if user_input := st.chat_input(f"Bana bir şeyler yaz..."):
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
