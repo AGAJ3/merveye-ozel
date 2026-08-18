@@ -6,7 +6,7 @@ import os
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
-GIZLI_ADMIN_SIFRESI = "murat123"  # Linkin sonuna yazacağın şifre
+GIZLI_ADMIN_SIFRESI = "murat123"  
 
 st.set_page_config(
     page_title=f"Sanal {SENIN_ADIN} ❤️",
@@ -17,13 +17,10 @@ st.set_page_config(
 # --- PEMBE, BEBEK UNICORN & ARKA PLAN CSS ---
 st.markdown("""
     <style>
-    /* Arka plan yumuşak pastel pembe geçişi */
     .stApp {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
         background-attachment: fixed;
     }
-    
-    /* Sohbet kutucukları */
     .stChatMessage {
         background-color: rgba(255, 255, 255, 0.90);
         border-radius: 18px;
@@ -33,32 +30,16 @@ st.markdown("""
         position: relative;
         z-index: 2;
     }
-    
-    /* Metin renkleri */
-    h1, h2, h3, p, span {
-        color: #4a2e35 !important;
-    }
+    h1, h2, h3, p, span { color: #4a2e35 !important; }
 
-    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU */
     .unicorn-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        pointer-events: none;
-        z-index: 0;
-        overflow: hidden;
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        pointer-events: none; z-index: 0; overflow: hidden;
     }
-
     .particle {
-        position: absolute;
-        bottom: -60px;
-        font-size: 26px;
-        animation: floatUp 8s linear infinite;
-        opacity: 0;
+        position: absolute; bottom: -60px; font-size: 26px;
+        animation: floatUp 8s linear infinite; opacity: 0;
     }
-
     .p1  { left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
     .p2  { left: 20%; animation-duration: 9s;  animation-delay: 1s; }
     .p3  { left: 35%; animation-duration: 8s;  animation-delay: 3s; }
@@ -108,6 +89,27 @@ GÖREVLERİN VE KARAKTERİN:
 5. Gerçek {SENIN_ADIN}'ı överken abartıya kaçma. Uzun uzun anlatmak yerine cümlenin sonuna esprili ve doğal tek bir not ekle. Örneğin: "Zaten zeki ve sporcu sevgilin de tam olarak bunu yapardı.", "Gerçek {SENIN_ADIN} da tam bunu söylerdi biliyorsun." gibi kısa ve tadında tut.
 """
 
+# --- ZİYARETÇİ IP VE CİHAZ BİLGİSİNİ ALMA ---
+try:
+    headers = st.context.headers
+    client_ip = headers.get("X-Forwarded-For", "IP Alınamadı").split(",")[0]
+    user_agent = headers.get("User-Agent", "Cihaz Alınamadı")
+except Exception:
+    client_ip = "Bilinmiyor"
+    user_agent = "Bilinmiyor"
+
+# Sayfaya her yeni giriş yapıldığında cihaz/IP bilgilerini kaydetme
+if "logged_visit" not in st.session_state:
+    st.session_state.logged_visit = True
+    zaman_visit = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    visit_info = f"\n[SİTEYE GİRİŞ] [{zaman_visit}]\nIP: {client_ip}\nCihaz/Tarayıcı: {user_agent}\n"
+    print(visit_info, flush=True)
+    try:
+        with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
+            f.write(visit_info + "-" * 40 + "\n")
+    except Exception:
+        pass
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -122,7 +124,6 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
 
     zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # flush=True ile Streamlit Cloud Log ekranına ANINDA düşmesi sağlandı
     print(f"\n[MESAJ] [{zaman}] {SEVGILININ_ADI}: {user_input}", flush=True)
 
     try:
@@ -160,22 +161,21 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
         except Exception as e:
             st.error(f"Merve'cim bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
 
-# --- GİZLİ ADMİN PANELİ (Sadece URL Parametresi İle Erişilebilir) ---
+# --- GİZLİ ADMİN PANELİ (URL Parametresi İle) ---
 admin_param = st.query_params.get("admin")
 
 if admin_param == GIZLI_ADMIN_SIFRESI:
     st.write("---")
     st.subheader("🕵️‍♂️ Gizli Canlı Takip Paneli")
     
-    # 5 saniyede bir otomatik yenilenen canlı log alanı
     @st.fragment(run_every=5)
     def live_logs():
         if os.path.exists("sohbet_kayitlari.txt"):
             with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
                 kayitlar = f.read()
             st.caption(f"Son Güncelleme: {datetime.datetime.now().strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
-            st.text_area("Canlı Sohbet Geçmişi:", value=kayitlar, height=350)
+            st.text_area("Canlı Sohbet & Giriş Geçmişi:", value=kayitlar, height=350)
         else:
-            st.info("Henüz kaydedilmiş bir sohbet yok.")
+            st.info("Henüz kaydedilmiş bir veri yok.")
             
     live_logs()
