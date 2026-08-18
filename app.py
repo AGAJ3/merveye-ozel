@@ -1,11 +1,12 @@
 import streamlit as st
 import google.generativeai as genai
 import datetime
+import os
 
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
-GIZLI_ADMIN_SIFRESI = "murat123"  # Kendi gizli şifrenizi buraya yazın
+GIZLI_ADMIN_SIFRESI = "murat123"  # Linkin sonuna yazacağın şifre
 
 st.set_page_config(
     page_title=f"Sanal {SENIN_ADIN} ❤️",
@@ -121,10 +122,9 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
 
     zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    # 1. CANLI KONSOLA YAZDIRMA (Streamlit "Manage App -> Logs" paneline düşer)
-    print(f"\n[MESAJ] [{zaman}] {SEVGILININ_ADI}: {user_input}")
+    # flush=True ile Streamlit Cloud Log ekranına ANINDA düşmesi sağlandı
+    print(f"\n[MESAJ] [{zaman}] {SEVGILININ_ADI}: {user_input}", flush=True)
 
-    # 2. DOSYAYA KAYDETME
     try:
         with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
             f.write(f"[{zaman}] {SEVGILININ_ADI}: {user_input}\n")
@@ -149,8 +149,7 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
             
-            # CANLI KONSOLA VE DOSYAYA YAZDIRMA
-            print(f"[CEVAP] [{zaman}] Sanal {SENIN_ADIN}: {response.text}\n")
+            print(f"[CEVAP] [{zaman}] Sanal {SENIN_ADIN}: {response.text}\n", flush=True)
             try:
                 with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
                     f.write(f"[{zaman}] Sanal {SENIN_ADIN}: {response.text}\n")
@@ -161,15 +160,22 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
         except Exception as e:
             st.error(f"Merve'cim bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
 
-# --- GİZLİ ADMİN PANELİ (Sadece Sen Görebilirsin) ---
-st.write("---")
-with st.expander("🔒 Yönetici Paneli"):
-    sifre = st.text_input("Gizli Şifre:", type="password")
-    if sifre == GIZLI_ADMIN_SIFRESI:
-        st.success("Giriş Başarılı!")
-        try:
+# --- GİZLİ ADMİN PANELİ (Sadece URL Parametresi İle Erişilebilir) ---
+admin_param = st.query_params.get("admin")
+
+if admin_param == GIZLI_ADMIN_SIFRESI:
+    st.write("---")
+    st.subheader("🕵️‍♂️ Gizli Canlı Takip Paneli")
+    
+    # 5 saniyede bir otomatik yenilenen canlı log alanı
+    @st.fragment(run_every=5)
+    def live_logs():
+        if os.path.exists("sohbet_kayitlari.txt"):
             with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
                 kayitlar = f.read()
-            st.text_area("Sohbet Geçmişi:", value=kayitlar, height=300)
-        except FileNotFoundError:
+            st.caption(f"Son Güncelleme: {datetime.datetime.now().strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
+            st.text_area("Canlı Sohbet Geçmişi:", value=kayitlar, height=350)
+        else:
             st.info("Henüz kaydedilmiş bir sohbet yok.")
+            
+    live_logs()
