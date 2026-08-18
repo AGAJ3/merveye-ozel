@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+import datetime  # Zaman damgası için eklendi
 
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
@@ -129,6 +130,14 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
     with st.chat_message("user"):
         st.markdown(user_input)
 
+    # --- KULLANICI MESAJINI TXT DOSYASINA KAYDETME ---
+    zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
+            f.write(f"[{zaman}] Merve: {user_input}\n")
+    except Exception:
+        pass # Hata verirse program çökmesin
+
     with st.chat_message("assistant"):
         try:
             model = genai.GenerativeModel(
@@ -146,5 +155,14 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
             
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
+            
+            # --- YAPAY ZEKA CEVABINI TXT DOSYASINA KAYDETME ---
+            try:
+                with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
+                    f.write(f"[{zaman}] Sanal Murat: {response.text}\n")
+                    f.write("-" * 40 + "\n") # Okuması kolay olsun diye araya çizgi çekiyoruz
+            except Exception:
+                pass
+
         except Exception as e:
             st.error(f"Merve'cim bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
