@@ -8,6 +8,9 @@ SEVGILININ_ADI = "Merve"
 SENIN_ADIN = "Murat"       
 GIZLI_ADMIN_SIFRESI = "murat123"  
 
+# Türkiye Saat Dilimi (UTC+3)
+TURKIYE_SAATI = datetime.timezone(datetime.timedelta(hours=3))
+
 st.set_page_config(
     page_title=f"Sanal {SENIN_ADIN} ❤️",
     page_icon="🦄",
@@ -92,21 +95,21 @@ GÖREVLERİN VE KARAKTERİN:
 # --- ZİYARETÇİ IP VE CİHAZ BİLGİSİNİ ALMA ---
 try:
     headers = st.context.headers
-    client_ip = headers.get("X-Forwarded-For", "IP Alınamadı").split(",")[0]
-    user_agent = headers.get("User-Agent", "Cihaz Alınamadı")
+    client_ip = headers.get("X-Forwarded-For", "Bilinmiyor").split(",")[0].strip()
+    user_agent = headers.get("User-Agent", "Bilinmiyor")
 except Exception:
     client_ip = "Bilinmiyor"
     user_agent = "Bilinmiyor"
 
-# Sayfaya her yeni giriş yapıldığında cihaz/IP bilgilerini kaydetme
+# Sayfaya her yeni giriş yapıldığında bilgileri 'giris_kayitlari.txt'ye yazma
 if "logged_visit" not in st.session_state:
     st.session_state.logged_visit = True
-    zaman_visit = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    visit_info = f"\n[SİTEYE GİRİŞ] [{zaman_visit}]\nIP: {client_ip}\nCihaz/Tarayıcı: {user_agent}\n"
-    print(visit_info, flush=True)
+    zaman_visit = datetime.datetime.now(TURKIYE_SAATI).strftime("%Y-%m-%d %H:%M:%S")
+    visit_info = f"[{zaman_visit}]\nIP: {client_ip}\nCihaz/Tarayıcı: {user_agent}\n" + "-"*40 + "\n"
+    print(f"\n[SİTEYE GİRİŞ]\n{visit_info}", flush=True)
     try:
-        with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
-            f.write(visit_info + "-" * 40 + "\n")
+        with open("giris_kayitlari.txt", "a", encoding="utf-8") as f:
+            f.write(visit_info)
     except Exception:
         pass
 
@@ -122,7 +125,7 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    zaman = datetime.datetime.now(TURKIYE_SAATI).strftime("%Y-%m-%d %H:%M:%S")
     
     print(f"\n[MESAJ] [{zaman}] {SEVGILININ_ADI}: {user_input}", flush=True)
 
@@ -161,21 +164,31 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
         except Exception as e:
             st.error(f"Merve'cim bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
 
-# --- GİZLİ ADMİN PANELİ (URL Parametresi İle) ---
+# --- GİZLİ ADMİN PANELİ (Ayrılmış Sekmeli Görünüm) ---
 admin_param = st.query_params.get("admin")
 
 if admin_param == GIZLI_ADMIN_SIFRESI:
     st.write("---")
-    st.subheader("🕵️‍♂️ Gizli Canlı Takip Paneli")
+    st.subheader("🕵️‍♂️ Gizli Yönetim Paneli")
     
     @st.fragment(run_every=5)
     def live_logs():
-        if os.path.exists("sohbet_kayitlari.txt"):
-            with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
-                kayitlar = f.read()
-            st.caption(f"Son Güncelleme: {datetime.datetime.now().strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
-            st.text_area("Canlı Sohbet & Giriş Geçmişi:", value=kayitlar, height=350)
-        else:
-            st.info("Henüz kaydedilmiş bir veri yok.")
+        st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIYE_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
+        
+        tab_sohbet, tab_giris = st.tabs(["💬 Sohbet Logları", "🚪 Giriş / IP Logları"])
+        
+        with tab_sohbet:
+            if os.path.exists("sohbet_kayitlari.txt"):
+                with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
+                    st.text_area("Sohbet Geçmişi:", value=f.read(), height=350)
+            else:
+                st.info("Henüz kaydedilmiş bir sohbet yok.")
+                
+        with tab_giris:
+            if os.path.exists("giris_kayitlari.txt"):
+                with open("giris_kayitlari.txt", "r", encoding="utf-8") as f:
+                    st.text_area("Giriş Geçmişi:", value=f.read(), height=350)
+            else:
+                st.info("Henüz kaydedilmiş giriş bilgisi yok.")
             
     live_logs()
