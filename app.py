@@ -11,7 +11,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- PEMBE, BEBEK UNICORN & UÇUŞAN TANECİK ANİMASYONLARI ---
+# --- PEMBE, BEBEK UNICORN & ARKA PLAN CSS ---
 st.markdown("""
     <style>
     /* Arka plan yumuşak pastel pembe geçişi */
@@ -20,13 +20,15 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Sohbet kutucukları (Glassmorphism stili) */
+    /* Sohbet kutucukları */
     .stChatMessage {
-        background-color: rgba(255, 255, 255, 0.88);
+        background-color: rgba(255, 255, 255, 0.90);
         border-radius: 18px;
         padding: 14px;
         border: 2px solid #ffb6c1;
-        box-shadow: 0 6px 20px rgba(255, 182, 193, 0.4);
+        box-shadow: 0 6px 20px rgba(255, 182, 193, 0.3);
+        position: relative;
+        z-index: 2; /* Yazıların öne çıkmasını sağlar */
     }
     
     /* Metin renkleri */
@@ -34,34 +36,34 @@ st.markdown("""
         color: #4a2e35 !important;
     }
 
-    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU */
+    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU (Sadece Arka Planda) */
     .unicorn-bg {
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        pointer-events: none; /* Tıklamayı engellemez */
-        z-index: 9999;
+        pointer-events: none;
+        z-index: 0; /* Tamamen arka plana alındı */
         overflow: hidden;
     }
 
     .particle {
         position: absolute;
         bottom: -60px;
-        font-size: 30px;
-        animation: floatUp 7s linear infinite;
+        font-size: 26px;
+        animation: floatUp 8s linear infinite;
         opacity: 0;
     }
 
-    /* Farklı pozisyon ve süre gecikmeleri */
-    .p1  { left: 5%;  animation-duration: 6s;  animation-delay: 0s; }
-    .p2  { left: 18%; animation-duration: 8s;  animation-delay: 1s; }
-    .p3  { left: 32%; animation-duration: 7s;  animation-delay: 3s; }
-    .p4  { left: 45%; animation-duration: 9s;  animation-delay: 2s; }
-    .p5  { left: 60%; animation-duration: 6s;  animation-delay: 4s; }
-    .p6  { left: 73%; animation-duration: 8s;  animation-delay: 1.5s; }
-    .p7  { left: 88%; animation-duration: 7s;  animation-delay: 3.5s; }
+    /* Pozisyon ve süre gecikmeleri */
+    .p1  { left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
+    .p2  { left: 20%; animation-duration: 9s;  animation-delay: 1s; }
+    .p3  { left: 35%; animation-duration: 8s;  animation-delay: 3s; }
+    .p4  { left: 50%; animation-duration: 10s; animation-delay: 2s; }
+    .p5  { left: 65%; animation-duration: 7s;  animation-delay: 4s; }
+    .p6  { left: 80%; animation-duration: 9s;  animation-delay: 1.5s; }
+    .p7  { left: 92%; animation-duration: 8s;  animation-delay: 3.5s; }
 
     @keyframes floatUp {
         0% {
@@ -69,19 +71,19 @@ st.markdown("""
             opacity: 0;
         }
         20% {
-            opacity: 0.9;
+            opacity: 0.6;
         }
         80% {
-            opacity: 0.9;
+            opacity: 0.6;
         }
         100% {
-            transform: translateY(-115vh) rotate(360deg) scale(1.2);
+            transform: translateY(-115vh) rotate(360deg) scale(1.1);
             opacity: 0;
         }
     }
     </style>
 
-    <!-- Arka Planda Uçuşan Elemanlar -->
+    <!-- Arka Planda Süzülen Elemanlar -->
     <div class="unicorn-bg">
         <div class="particle p1">🦄</div>
         <div class="particle p2">💖</div>
@@ -105,15 +107,14 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 SYSTEM_PROMPT = f"""
-Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında dünyalar güzeli {SEVGILININ_ADI} var.
+Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında {SEVGILININ_ADI} var.
 
 GÖREVLERİN VE KARAKTERİN:
-1. {SEVGILININ_ADI} ile konuşurken her zaman onun flörtü {SENIN_ADIN} gibi davranacaksın. Üslubun son derece flörtöz, romantik, eğlenceli ve tutkulu olmalı.
-2. KESİNLİKLE yazılım, kodlama, matematik, tarih veya teknik bilgi gerektiren sorulara cevap VERME! Eğer sana böyle "sıkıcı" ve mantıksal şeyler sorarsa konuyu hemen tatlıca değiştir. Örneğin: "Boşver şimdi kodu yazılımı, senin o güzel gözlerin varken bunları mı konuşacağız?" veya "Bunları boşver de, bugün ne kadar güzel olduğunun farkında mısın?" gibi cevaplar ver.
-3. Onun gündelik dertlerini dinle, gününün nasıl geçtiğini sor ve onu her zaman şımart.
-4. Robotik kelimeler ("Size nasıl yardımcı olabilirim", "Bir yapay zeka olarak" vb.) ASLA kullanma. Gerçek bir erkek arkadaş WhatsApp'tan nasıl yazarsa öyle, doğal ve samimi yaz.
-5. Her fırsatta ona ne kadar aşık olduğunu, onu ne kadar çok sevdiğini ve özlediğini belli et. Arada tatlı iltifatlar yap.
-6. ÇOK ÖNEMLİ: Sen sadece Sanal Murat'sın ve asıl amacın GERÇEK Murat'ı övmek. Verdiğin cevapların içine veya sonuna mutlaka "Gerçek Murat da tam olarak böyle düşünürdü", "O zeki ve yakışıklı sevgilin sana tam da bunu söylerdi" gibi ifadeler ekle. Gerçek Murat'ın zeki, çok yakışıklı ve spor yapan harika biri olduğunu Merve'ye aralarda tatlı tatlı hissettir ve ona asıl rakip olmadığını belli et.
+1. {SEVGILININ_ADI} ile konuşurken samimi, doğal, hafif flörtöz ve eğlenceli olacaksın.
+2. KESİNLİKLE yazılım, kodlama, matematik veya teknik bilgi gerektiren sorulara cevap VERME! Konuyu hemen eğlenceli bir şekilde değiştir.
+3. KESİNLİKLE uzun, pembe dizi tadında ağdalı/romantik edebiyat yapma, abartılı senaryolar yazma! Cevapların tıpkı gerçek bir WhatsApp mesajı gibi KISA, NET ve samimi olsun.
+4. Robotik kalıplar ("Size nasıl yardımcı olabilirim" vb.) ASLA kullanma.
+5. Gerçek {SENIN_ADIN}'ı överken abartıya kaçma. Uzun uzun anlatmak yerine cümlenin sonuna esprili ve doğal tek bir not ekle. Örneğin: "Zaten zeki ve sporcu sevgilin de tam olarak bunu yapardı.", "Gerçek {SENIN_ADIN} da tam bunu söylerdi biliyorsun." gibi kısa ve tadında tut.
 """
 
 if "messages" not in st.session_state:
