@@ -1,10 +1,11 @@
 import streamlit as st
 import google.generativeai as genai
-import datetime  # Zaman damgası için eklendi
+import datetime
 
 # İsimleriniz
 SEVGILININ_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
+GIZLI_ADMIN_SIFRESI = "murat123"  # Kendi gizli şifrenizi buraya yazın
 
 st.set_page_config(
     page_title=f"Sanal {SENIN_ADIN} ❤️",
@@ -29,7 +30,7 @@ st.markdown("""
         border: 2px solid #ffb6c1;
         box-shadow: 0 6px 20px rgba(255, 182, 193, 0.3);
         position: relative;
-        z-index: 2; /* Yazıların öne çıkmasını sağlar */
+        z-index: 2;
     }
     
     /* Metin renkleri */
@@ -37,7 +38,7 @@ st.markdown("""
         color: #4a2e35 !important;
     }
 
-    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU (Sadece Arka Planda) */
+    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU */
     .unicorn-bg {
         position: fixed;
         top: 0;
@@ -45,7 +46,7 @@ st.markdown("""
         width: 100vw;
         height: 100vh;
         pointer-events: none;
-        z-index: 0; /* Tamamen arka plana alındı */
+        z-index: 0;
         overflow: hidden;
     }
 
@@ -57,7 +58,6 @@ st.markdown("""
         opacity: 0;
     }
 
-    /* Pozisyon ve süre gecikmeleri */
     .p1  { left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
     .p2  { left: 20%; animation-duration: 9s;  animation-delay: 1s; }
     .p3  { left: 35%; animation-duration: 8s;  animation-delay: 3s; }
@@ -67,24 +67,13 @@ st.markdown("""
     .p7  { left: 92%; animation-duration: 8s;  animation-delay: 3.5s; }
 
     @keyframes floatUp {
-        0% {
-            transform: translateY(0) rotate(0deg) scale(0.8);
-            opacity: 0;
-        }
-        20% {
-            opacity: 0.6;
-        }
-        80% {
-            opacity: 0.6;
-        }
-        100% {
-            transform: translateY(-115vh) rotate(360deg) scale(1.1);
-            opacity: 0;
-        }
+        0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+        20% { opacity: 0.6; }
+        80% { opacity: 0.6; }
+        100% { transform: translateY(-115vh) rotate(360deg) scale(1.1); opacity: 0; }
     }
     </style>
 
-    <!-- Arka Planda Süzülen Elemanlar -->
     <div class="unicorn-bg">
         <div class="particle p1">🦄</div>
         <div class="particle p2">💖</div>
@@ -130,13 +119,17 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # --- KULLANICI MESAJINI TXT DOSYASINA KAYDETME ---
     zaman = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    # 1. CANLI KONSOLA YAZDIRMA (Streamlit "Manage App -> Logs" paneline düşer)
+    print(f"\n[MESAJ] [{zaman}] {SEVGILININ_ADI}: {user_input}")
+
+    # 2. DOSYAYA KAYDETME
     try:
         with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
-            f.write(f"[{zaman}] Merve: {user_input}\n")
+            f.write(f"[{zaman}] {SEVGILININ_ADI}: {user_input}\n")
     except Exception:
-        pass # Hata verirse program çökmesin
+        pass
 
     with st.chat_message("assistant"):
         try:
@@ -156,13 +149,27 @@ if user_input := st.chat_input(f"Bana bir şeyler yaz {SEVGILININ_ADI}..."):
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
             
-            # --- YAPAY ZEKA CEVABINI TXT DOSYASINA KAYDETME ---
+            # CANLI KONSOLA VE DOSYAYA YAZDIRMA
+            print(f"[CEVAP] [{zaman}] Sanal {SENIN_ADIN}: {response.text}\n")
             try:
                 with open("sohbet_kayitlari.txt", "a", encoding="utf-8") as f:
-                    f.write(f"[{zaman}] Sanal Murat: {response.text}\n")
-                    f.write("-" * 40 + "\n") # Okuması kolay olsun diye araya çizgi çekiyoruz
+                    f.write(f"[{zaman}] Sanal {SENIN_ADIN}: {response.text}\n")
+                    f.write("-" * 40 + "\n")
             except Exception:
                 pass
 
         except Exception as e:
             st.error(f"Merve'cim bir hata oluştu, Murat'a haber ver hemen düzeltsin: {e}")
+
+# --- GİZLİ ADMİN PANELİ (Sadece Sen Görebilirsin) ---
+st.write("---")
+with st.expander("🔒 Yönetici Paneli"):
+    sifre = st.text_input("Gizli Şifre:", type="password")
+    if sifre == GIZLI_ADMIN_SIFRESI:
+        st.success("Giriş Başarılı!")
+        try:
+            with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
+                kayitlar = f.read()
+            st.text_area("Sohbet Geçmişi:", value=kayitlar, height=300)
+        except FileNotFoundError:
+            st.info("Henüz kaydedilmiş bir sohbet yok.")
