@@ -11,33 +11,87 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- PEMBE & BEBEK UNICORN KONSEPTİ VE ARKA PLAN CSS ---
+# --- PEMBE, BEBEK UNICORN & UÇUŞAN TANECİK ANİMASYONLARI ---
 st.markdown("""
     <style>
-    /* Arka planı yumuşak pastel pembe tonlarına boyama */
+    /* Arka plan yumuşak pastel pembe geçişi */
     .stApp {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
         background-attachment: fixed;
     }
     
-    /* Sohbet kutucuklarını pembe konseptine uygun, şık ve yarı şeffaf beyaz yapma */
+    /* Sohbet kutucukları (Glassmorphism stili) */
     .stChatMessage {
-        background-color: rgba(255, 255, 255, 0.85);
-        border-radius: 15px;
-        padding: 12px;
+        background-color: rgba(255, 255, 255, 0.88);
+        border-radius: 18px;
+        padding: 14px;
         border: 2px solid #ffb6c1;
-        box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+        box-shadow: 0 6px 20px rgba(255, 182, 193, 0.4);
     }
     
-    /* Yazı renklerini okunaklı ve tatlı bir tona sabitleme */
+    /* Metin renkleri */
     h1, h2, h3, p, span {
         color: #4a2e35 !important;
     }
-    </style>
-""", unsafe_allow_html=True)
 
-# Ekranı süsleyen bebek unicornlar
-st.markdown("<h3 style='text-align: center;'>🦄 🦄 🦄 🦄 🦄 🦄 🦄</h3>", unsafe_allow_html=True)
+    /* UÇUŞAN UNICORN VE KALPLERİN ANİMASYONU */
+    .unicorn-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none; /* Tıklamayı engellemez */
+        z-index: 9999;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        bottom: -60px;
+        font-size: 30px;
+        animation: floatUp 7s linear infinite;
+        opacity: 0;
+    }
+
+    /* Farklı pozisyon ve süre gecikmeleri */
+    .p1  { left: 5%;  animation-duration: 6s;  animation-delay: 0s; }
+    .p2  { left: 18%; animation-duration: 8s;  animation-delay: 1s; }
+    .p3  { left: 32%; animation-duration: 7s;  animation-delay: 3s; }
+    .p4  { left: 45%; animation-duration: 9s;  animation-delay: 2s; }
+    .p5  { left: 60%; animation-duration: 6s;  animation-delay: 4s; }
+    .p6  { left: 73%; animation-duration: 8s;  animation-delay: 1.5s; }
+    .p7  { left: 88%; animation-duration: 7s;  animation-delay: 3.5s; }
+
+    @keyframes floatUp {
+        0% {
+            transform: translateY(0) rotate(0deg) scale(0.8);
+            opacity: 0;
+        }
+        20% {
+            opacity: 0.9;
+        }
+        80% {
+            opacity: 0.9;
+        }
+        100% {
+            transform: translateY(-115vh) rotate(360deg) scale(1.2);
+            opacity: 0;
+        }
+    }
+    </style>
+
+    <!-- Arka Planda Uçuşan Elemanlar -->
+    <div class="unicorn-bg">
+        <div class="particle p1">🦄</div>
+        <div class="particle p2">💖</div>
+        <div class="particle p3">🦄</div>
+        <div class="particle p4">✨</div>
+        <div class="particle p5">🦄</div>
+        <div class="particle p6">💖</div>
+        <div class="particle p7">🦄</div>
+    </div>
+""", unsafe_allow_html=True)
 
 st.title(f"🔥 Sanal {SENIN_ADIN} ❤️")
 st.caption(f"{SENIN_ADIN} Tarafından {SEVGILININ_ADI} için hazırlandı. Ne sormak istersin?")
