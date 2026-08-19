@@ -7,11 +7,11 @@ import json
 # --- KULLANICI BİLGİLERİ VE ŞİFRELER ---
 FLORTUN_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
-GIZLI_ADMIN_SIFRESI = "murat123"  # Admin paneli URL şifresi
+GIZLI_ADMIN_SIFRESI = "1999Mrt+"  # Admin paneli URL şifresi güncellendi
 
-# SİSTEME GİRİŞ ŞİFRELERİ (Bunları değiştirebilirsin)
+# SİSTEME GİRİŞ ŞİFRELERİ
 MERVE_GIRIS_SIFRESI = "merve123"
-MURAT_GIRIS_SIFRESI = "1999Mrt+
+MURAT_GIRIS_SIFRESI = "1999Mrt+"  # Murat'ın şifresi güncellendi
 
 # Veri Tabanı Dosyaları
 OZEL_SOHBET_DOSYASI = "ozel_sohbet_db.json"
@@ -21,7 +21,7 @@ TURKIYE_SAATI = datetime.timezone(datetime.timedelta(hours=3))
 
 st.set_page_config(page_title="Bize Özel ✨", page_icon="🤫", layout="centered")
 
-# --- ARKA PLAN VE CSS (Kalpler temizlendi, daha cool bir hava eklendi) ---
+# --- ARKA PLAN VE CSS ---
 st.markdown("""
     <style>
     .stApp {
@@ -112,9 +112,9 @@ if st.session_state.current_user is None:
             st.rerun()
         else:
             st.error("Şifre veya Kullanıcı hatalı! Tekrar dene.")
-    st.stop() # Giriş yapılmadıysa uygulamanın devamını çalıştırma
+    st.stop()
 
-# --- ANA UYGULAMA (GİRİŞ YAPILDIKTAN SONRA) ---
+# --- ANA UYGULAMA ---
 st.sidebar.title(f"Hoş geldin, {st.session_state.current_user}! ✨")
 app_modu = st.sidebar.radio("Nereye Gitmek İstersin?", ["💬 Bize Özel (Canlı Sohbet)", "🤖 Sanal Murat (Yapay Zeka)"])
 
@@ -127,7 +127,6 @@ if app_modu == "💬 Bize Özel (Canlı Sohbet)":
     st.title("💬 Bize Özel")
     st.caption("Sadece ikimiz arasında... 😉 Emojileri klavyenden ekleyebilirsin.")
     
-    # Yardımcı Fonksiyonlar: JSON'dan mesaj okuma ve yazma
     def load_ozel_sohbet():
         if os.path.exists(OZEL_SOHBET_DOSYASI):
             with open(OZEL_SOHBET_DOSYASI, "r", encoding="utf-8") as f:
@@ -138,7 +137,6 @@ if app_modu == "💬 Bize Özel (Canlı Sohbet)":
         with open(OZEL_SOHBET_DOSYASI, "w", encoding="utf-8") as f:
             json.dump(msgs, f, ensure_ascii=False, indent=4)
 
-    # CANLI YENİLEME FRAGMENTİ (2 Saniyede bir arka planda yenilenir)
     @st.fragment(run_every=2)
     def canli_sohbet_ekrani():
         mesajlar = load_ozel_sohbet()
@@ -146,25 +144,20 @@ if app_modu == "💬 Bize Özel (Canlı Sohbet)":
             st.info("Henüz mesaj yok. İlk adımı sen at! ✨")
             
         for m in mesajlar:
-            # Gelen mesaj bizden mi, karşıdan mı?
             if m["sender"] == st.session_state.current_user:
-                # Kendi gönderdiğimiz mesajlar
                 with st.chat_message("user", avatar="😎" if st.session_state.current_user == SENIN_ADIN else "👱‍♀️"):
                     st.markdown(f"**Sen:** {m['text']}")
                     st.caption(m['time'])
             else:
-                # Karşı tarafın mesajları
                 with st.chat_message("assistant", avatar="👱‍♀️" if m["sender"] == FLORTUN_ADI else "😎"):
                     st.markdown(f"**{m['sender']}:** {m['text']}")
                     st.caption(m['time'])
                     
     canli_sohbet_ekrani()
 
-    # Mesaj Gönderme Inputu
     if yeni_mesaj := st.chat_input("Bir şeyler yaz... (GIF eklemek için ![gif](link) kullanabilirsin)"):
         zaman_str = datetime.datetime.now(TURKIYE_SAATI).strftime("%H:%M")
         
-        # JSON'a kaydet (Canlı sohbet için)
         aktif_mesajlar = load_ozel_sohbet()
         aktif_mesajlar.append({
             "sender": st.session_state.current_user,
@@ -173,7 +166,6 @@ if app_modu == "💬 Bize Özel (Canlı Sohbet)":
         })
         save_ozel_sohbet(aktif_mesajlar)
         
-        # Admin loguna kaydet (Arşiv için)
         admin_zaman = datetime.datetime.now(TURKIYE_SAATI).strftime("%Y-%m-%d %H:%M:%S")
         try:
             with open("ozel_sohbet_log.txt", "a", encoding="utf-8") as f:
@@ -195,7 +187,7 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
 
         SYSTEM_PROMPT = f"""
         Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında flörtün {FLORTUN_ADI} var.
-        1. İLETİŞİM DİLİ: {FLORTUN_ADI} ile konuşurken samimi, özgüvenli, cool, eğlenceli ve tatlı bir flörtöz tonda olacaksın. Fazla yapışkan, romantik veya ciddiyet barındıran ("harika bir çiftiz", "geleceğimiz" vb.) kelimeler KULLANMA. Gizemli ve çekici ol.
+        1. İLETİŞİM DİLİ: {FLORTUN_ADI} ile konuşurken samimi, özgüvenli, cool, eğlenceli ve tatlı bir flörtöz tonda olacaksın. Fazla yapışkan, romantik veya ciddiyet barındıran kelimeler KULLANMA. Gizemli ve çekici ol.
         2. ÖVGÜ TALİMATI: Merve'nin zekasını, enerjisini ve güzelliğini zarifçe öv. MERVE'NİN GÖZLERİ YEŞİLDİR. Fırsat buldukça o güzel yeşil gözlere ince ve cool iltifatlar et.
         3. KRİTİK KURAL: Merve "Sence güzel miyim?", "Nasıl görünüyorum?" sorarsa, doğrudan "Murat bana senden çok bahsetti..." şeklinde lafa gir ve yeşil gözlerinin, enerjisinin ne kadar etkileyici olduğundan bahset.
         4. BİLİNÇALTI TELKİN: Gerçek Murat'ın kolay etkilenen biri olmadığını, Merve'nin ve aralarındaki çekimin onun için çok farklı ve özel olduğunu hissettir. Birlikte yapılacak eğlenceli planlara ince göndermeler yap.
@@ -242,17 +234,15 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
                     st.error(f"Hata oluştu: {e}")
 
 # --- GİZLİ ADMİN PANELİ ---
-# Merve'nin asla görememesi için ÇİFT GÜVENLİK
 admin_param = st.query_params.get("admin")
 
-# Şifre murat123 OLSA BİLE, login olan kişi Murat DEĞİLSE panel açılmaz!
 if admin_param == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") == SENIN_ADIN:
     st.write("---")
     st.subheader("🕵️‍♂️ Gizli Yönetim Paneli")
     
     @st.fragment(run_every=5)
     def live_admin_logs():
-        st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIYE_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
+        st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIY_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
         
         tab_ozel, tab_sohbet, tab_giris = st.tabs(["💬 Canlı Chat Logları", "🤖 YZ Sohbet Logları", "🚪 Giriş Logları"])
         
