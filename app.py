@@ -11,7 +11,7 @@ GIZLI_ADMIN_SIFRESI = "murat123"  # Admin paneli URL şifresi
 
 # SİSTEME GİRİŞ ŞİFRELERİ (Bunları değiştirebilirsin)
 MERVE_GIRIS_SIFRESI = "merve123"
-MURAT_GIRIS_SIFRESI = "murat123"
+MURAT_GIRIS_SIFRESI = "1999Mrt+
 
 # Veri Tabanı Dosyaları
 OZEL_SOHBET_DOSYASI = "ozel_sohbet_db.json"
