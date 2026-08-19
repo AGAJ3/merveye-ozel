@@ -7,11 +7,13 @@ import json
 # --- KULLANICI BİLGİLERİ VE ŞİFRELER ---
 FLORTUN_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
-GIZLI_ADMIN_SIFRESI = "1999Mrt+"  # Admin paneli URL şifresi güncellendi
+
+# URL ve Admin şifresindeki '+' işareti tarayıcılarda bozulabildiği için düzeltildi:
+GIZLI_ADMIN_SIFRESI = "1999Mrt"  
 
 # SİSTEME GİRİŞ ŞİFRELERİ
 MERVE_GIRIS_SIFRESI = "merve123"
-MURAT_GIRIS_SIFRESI = "1999Mrt+"  # Murat'ın şifresi güncellendi
+MURAT_GIRIS_SIFRESI = "1999Mrt+"  # Siteye giriş şifren aynen kalabilir
 
 # Veri Tabanı Dosyaları
 OZEL_SOHBET_DOSYASI = "ozel_sohbet_db.json"
@@ -216,7 +218,7 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
 
             with st.chat_message("assistant"):
                 try:
-                    model = genai.GenerativeModel(model_name="gemini-3.6-flash", system_instruction=SYSTEM_PROMPT)
+                    model = genai.GenerativeModel(model_name="geminit-3.6-flash" if "geminit" in "gemini" else "gemini-2.5-flash", system_instruction=SYSTEM_PROMPT)
                     history = [{"role": "user" if m["role"] == "user" else "model", "parts": [m["content"]]} for m in st.session_state.ai_messages[:-1]]
                     chat = model.start_chat(history=history)
                     response = chat.send_message(user_input)
@@ -231,18 +233,26 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
                     except Exception:
                         pass
                 except Exception as e:
-                    st.error(f"Hata oluştu: {e}")
+                    # Model adı hatasına karşı emniyet supabı
+                    try:
+                        model = genai.GenerativeModel(model_name="gemini-1.5-flash", system_instruction=SYSTEM_PROMPT)
+                        response = model.generate_content(user_input)
+                        st.markdown(response.text)
+                        st.session_state.ai_messages.append({"role": "assistant", "content": response.text})
+                    except Exception as err:
+                        st.error(f"Hata oluştu: {err}")
 
 # --- GİZLİ ADMİN PANELİ ---
-admin_param = st.query_params.get("admin")
+admin_param = st.query_params.get("admin", "")
 
-if admin_param == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") == SENIN_ADIN:
+# URL kontrolü hataya yer bırakmayacak şekilde güçlendirildi
+if str(admin_param) == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") == SENIN_ADIN:
     st.write("---")
     st.subheader("🕵️‍♂️ Gizli Yönetim Paneli")
     
     @st.fragment(run_every=5)
     def live_admin_logs():
-        st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIY_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
+        st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIYE_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
         
         tab_ozel, tab_sohbet, tab_giris = st.tabs(["💬 Canlı Chat Logları", "🤖 YZ Sohbet Logları", "🚪 Giriş Logları"])
         
@@ -254,8 +264,8 @@ if admin_param == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") =
                 st.info("Henüz kaydedilmiş canlı chat yok.")
                 
         with tab_sohbet:
-            if os.path.exists("sohbet_kayitlari.txt"):
-                with open("sohbet_kayitlari.txt", "r", encoding="utf-8") as f:
+            if os.path.exists("sohbet_loglari.txt"):
+                with open("sohbet_loglari.txt", "r", encoding="utf-8") as f:
                     st.text_area("Yapay Zeka Sohbet Geçmişi:", value=f.read(), height=350)
             else:
                 st.info("Henüz yapay zekayla sohbet edilmemiş.")
