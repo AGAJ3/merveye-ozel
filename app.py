@@ -5,7 +5,7 @@ import os
 import json
 
 # --- KULLANICI BİLGİLERİ VE ŞİFRELER ---
-SEVGILININ_ADI = "Merve" 
+FLORTUN_ADI = "Merve" 
 SENIN_ADIN = "Murat"       
 GIZLI_ADMIN_SIFRESI = "murat123"  # Admin paneli URL şifresi
 
@@ -19,9 +19,9 @@ OZEL_SOHBET_DOSYASI = "ozel_sohbet_db.json"
 # Türkiye Saat Dilimi (UTC+3)
 TURKIYE_SAATI = datetime.timezone(datetime.timedelta(hours=3))
 
-st.set_page_config(page_title="Bizim Alanımız ❤️", page_icon="🦄", layout="centered")
+st.set_page_config(page_title="Bize Özel ✨", page_icon="🤫", layout="centered")
 
-# --- PEMBE, BEBEK UNICORN & ARKA PLAN CSS ---
+# --- ARKA PLAN VE CSS (Kalpler temizlendi, daha cool bir hava eklendi) ---
 st.markdown("""
     <style>
     .stApp {
@@ -63,13 +63,13 @@ st.markdown("""
     }
     </style>
     <div class="unicorn-bg">
-        <div class="particle p1">🦄</div>
-        <div class="particle p2">💖</div>
-        <div class="particle p3">🦄</div>
-        <div class="particle p4">✨</div>
-        <div class="particle p5">🦄</div>
-        <div class="particle p6">💖</div>
-        <div class="particle p7">🦄</div>
+        <div class="particle p1">✨</div>
+        <div class="particle p2">🔥</div>
+        <div class="particle p3">✨</div>
+        <div class="particle p4">🥂</div>
+        <div class="particle p5">✨</div>
+        <div class="particle p6">🔥</div>
+        <div class="particle p7">😉</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -97,15 +97,15 @@ if "current_user" not in st.session_state:
     st.session_state.current_user = None
 
 if st.session_state.current_user is None:
-    st.title("🔒 Özel Alanımıza Hoş Geldin")
-    st.write("Lütfen kim olduğunu seç ve şifreni gir.")
+    st.title("🔒 Gizli Frekans")
+    st.write("Kim olduğunu seç ve şifreni gir.")
     
-    secilen_kisi = st.selectbox("Kimsin?", ["Seçiniz...", SEVGILININ_ADI, SENIN_ADIN])
+    secilen_kisi = st.selectbox("Kimsin?", ["Seçiniz...", FLORTUN_ADI, SENIN_ADIN])
     girilen_sifre = st.text_input("Şifre:", type="password")
     
     if st.button("Giriş Yap 🚀"):
-        if secilen_kisi == SEVGILININ_ADI and girilen_sifre == MERVE_GIRIS_SIFRESI:
-            st.session_state.current_user = SEVGILININ_ADI
+        if secilen_kisi == FLORTUN_ADI and girilen_sifre == MERVE_GIRIS_SIFRESI:
+            st.session_state.current_user = FLORTUN_ADI
             st.rerun()
         elif secilen_kisi == SENIN_ADIN and girilen_sifre == MURAT_GIRIS_SIFRESI:
             st.session_state.current_user = SENIN_ADIN
@@ -116,16 +116,16 @@ if st.session_state.current_user is None:
 
 # --- ANA UYGULAMA (GİRİŞ YAPILDIKTAN SONRA) ---
 st.sidebar.title(f"Hoş geldin, {st.session_state.current_user}! ✨")
-app_modu = st.sidebar.radio("Nereye Gitmek İstersin?", ["💑 Özel Sığınak (Canlı Sohbet)", "🤖 Sanal Murat (Yapay Zeka)"])
+app_modu = st.sidebar.radio("Nereye Gitmek İstersin?", ["💬 Bize Özel (Canlı Sohbet)", "🤖 Sanal Murat (Yapay Zeka)"])
 
 if st.sidebar.button("🚪 Çıkış Yap"):
     st.session_state.current_user = None
     st.rerun()
 
-# --- MOD 1: ÖZEL SIĞINAK (CANLI MESAJLAŞMA) ---
-if app_modu == "💑 Özel Sığınak (Canlı Sohbet)":
-    st.title("💑 Bizim Özel Sığınağımız")
-    st.caption("Buradaki mesajlar sadece ikimiz arasında... ❤️ Emojileri klavyenden ekleyebilirsin.")
+# --- MOD 1: ÖZEL CHAT (CANLI MESAJLAŞMA) ---
+if app_modu == "💬 Bize Özel (Canlı Sohbet)":
+    st.title("💬 Bize Özel")
+    st.caption("Sadece ikimiz arasında... 😉 Emojileri klavyenden ekleyebilirsin.")
     
     # Yardımcı Fonksiyonlar: JSON'dan mesaj okuma ve yazma
     def load_ozel_sohbet():
@@ -149,12 +149,12 @@ if app_modu == "💑 Özel Sığınak (Canlı Sohbet)":
             # Gelen mesaj bizden mi, karşıdan mı?
             if m["sender"] == st.session_state.current_user:
                 # Kendi gönderdiğimiz mesajlar
-                with st.chat_message("user", avatar="😎" if st.session_state.current_user == SENIN_ADIN else "👸"):
+                with st.chat_message("user", avatar="😎" if st.session_state.current_user == SENIN_ADIN else "👱‍♀️"):
                     st.markdown(f"**Sen:** {m['text']}")
                     st.caption(m['time'])
             else:
                 # Karşı tarafın mesajları
-                with st.chat_message("assistant", avatar="👸" if m["sender"] == SEVGILININ_ADI else "😎"):
+                with st.chat_message("assistant", avatar="👱‍♀️" if m["sender"] == FLORTUN_ADI else "😎"):
                     st.markdown(f"**{m['sender']}:** {m['text']}")
                     st.caption(m['time'])
                     
@@ -184,8 +184,8 @@ if app_modu == "💑 Özel Sığınak (Canlı Sohbet)":
 
 # --- MOD 2: SANAL MURAT (YAPAY ZEKA) ---
 elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
-    st.title(f"🔥 Sanal {SENIN_ADIN} ❤️")
-    st.caption("Aşkım gerçek Murat meşgulse ben buradayım 😉")
+    st.title(f"🔥 Sanal {SENIN_ADIN}")
+    st.caption("Gerçek Murat meşgulse ben buradayım, ne konuşuyorduk? 😉")
 
     api_key = st.secrets.get("GEMINI_API_KEY")
     if not api_key:
@@ -194,12 +194,12 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
         genai.configure(api_key=api_key)
 
         SYSTEM_PROMPT = f"""
-        Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında {SEVGILININ_ADI} var.
-        1. İLETİŞİM DİLİ: {SEVGILININ_ADI} ile konuşurken samimi, zarif, romantik, karizmatik ve tatlı-flörtöz olacaksın. KESİNLİKLE ucuz, laubali, sulu laflar KULLANMA.
-        2. ÖVGÜ TALİMATI: Merve'nin eşsiz güzelliğini, zekasını ve enerjisini tatlı bir dille öv. MERVE'NİN GÖZLERİ YEŞİLDİR. Fırsat buldukça o güzel yeşil gözlere zarif iltifatlar et.
-        3. KRİTİK KURAL: Merve "Sence güzel miyim?", "Nasıl görünüyorum?" sorarsa, doğrudan "Murat bana seni o kadar çok anlattı ki..." şeklinde lafa gir ve yeşil gözlerinden, büyüsünden bahset.
-        4. BİLİNÇALTI TELKİN: Gerçek Murat'ın herkese böyle jestler yapmadığını, Merve'nin onun için çok özel olduğunu hissettir. İlerideki güzel günlere romantik göndermeler yap.
-        5. BURÇLAR: Merve KOÇ, Murat OĞLAK burcu. Burç sorarsa; Koç'un büyüleyici enerjisiyle Oğlak'ın sağlam duruşunun "Power Couple" olduğunu zarifçe anlat.
+        Sen bir yapay zeka veya asistan DEĞİLSİN. Senin adın {SENIN_ADIN} ve karşında flörtün {FLORTUN_ADI} var.
+        1. İLETİŞİM DİLİ: {FLORTUN_ADI} ile konuşurken samimi, özgüvenli, cool, eğlenceli ve tatlı bir flörtöz tonda olacaksın. Fazla yapışkan, romantik veya ciddiyet barındıran ("harika bir çiftiz", "geleceğimiz" vb.) kelimeler KULLANMA. Gizemli ve çekici ol.
+        2. ÖVGÜ TALİMATI: Merve'nin zekasını, enerjisini ve güzelliğini zarifçe öv. MERVE'NİN GÖZLERİ YEŞİLDİR. Fırsat buldukça o güzel yeşil gözlere ince ve cool iltifatlar et.
+        3. KRİTİK KURAL: Merve "Sence güzel miyim?", "Nasıl görünüyorum?" sorarsa, doğrudan "Murat bana senden çok bahsetti..." şeklinde lafa gir ve yeşil gözlerinin, enerjisinin ne kadar etkileyici olduğundan bahset.
+        4. BİLİNÇALTI TELKİN: Gerçek Murat'ın kolay etkilenen biri olmadığını, Merve'nin ve aralarındaki çekimin onun için çok farklı ve özel olduğunu hissettir. Birlikte yapılacak eğlenceli planlara ince göndermeler yap.
+        5. BURÇLAR: Merve KOÇ, Murat OĞLAK burcu. Burç sorarsa; Koç'un ateşi ve enerjisiyle Oğlak'ın sarsılmaz cool duruşunun astrolojideki en dikkat çekici "Power Couple" olduğunu flörtöz bir şekilde anlat.
         6. KESİNLİKLE kısa, net ve WhatsApp mesajı gibi konuş.
         """
 
@@ -242,7 +242,7 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
                     st.error(f"Hata oluştu: {e}")
 
 # --- GİZLİ ADMİN PANELİ ---
-# Merve'nin asla görememesi için ÇİFT GÜVENLİK eklendi
+# Merve'nin asla görememesi için ÇİFT GÜVENLİK
 admin_param = st.query_params.get("admin")
 
 # Şifre murat123 OLSA BİLE, login olan kişi Murat DEĞİLSE panel açılmaz!
@@ -254,14 +254,14 @@ if admin_param == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") =
     def live_admin_logs():
         st.caption(f"Son Güncelleme: {datetime.datetime.now(TURKIYE_SAATI).strftime('%H:%M:%S')} (Her 5s'de otomatik yenilenir)")
         
-        tab_ozel, tab_sohbet, tab_giris = st.tabs(["💑 Özel Chat Logları", "💬 YZ Sohbet Logları", "🚪 Giriş Logları"])
+        tab_ozel, tab_sohbet, tab_giris = st.tabs(["💬 Canlı Chat Logları", "🤖 YZ Sohbet Logları", "🚪 Giriş Logları"])
         
         with tab_ozel:
             if os.path.exists("ozel_sohbet_log.txt"):
                 with open("ozel_sohbet_log.txt", "r", encoding="utf-8") as f:
                     st.text_area("İkili Canlı Mesajlaşma Geçmişi:", value=f.read(), height=350)
             else:
-                st.info("Henüz kaydedilmiş özel mesaj yok.")
+                st.info("Henüz kaydedilmiş canlı chat yok.")
                 
         with tab_sohbet:
             if os.path.exists("sohbet_kayitlari.txt"):
