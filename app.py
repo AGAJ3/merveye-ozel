@@ -148,7 +148,7 @@ if app_modu == "💑 Özel Sığınak (Canlı Sohbet)":
         for m in mesajlar:
             # Gelen mesaj bizden mi, karşıdan mı?
             if m["sender"] == st.session_state.current_user:
-                # Kendi gönderdiğimiz mesajlar (Sağ tarafa yaslanmış hissi verir)
+                # Kendi gönderdiğimiz mesajlar
                 with st.chat_message("user", avatar="😎" if st.session_state.current_user == SENIN_ADIN else "👸"):
                     st.markdown(f"**Sen:** {m['text']}")
                     st.caption(m['time'])
@@ -242,10 +242,11 @@ elif app_modu == "🤖 Sanal Murat (Yapay Zeka)":
                     st.error(f"Hata oluştu: {e}")
 
 # --- GİZLİ ADMİN PANELİ ---
-# Admin paneli girişten bağımsız olarak URL sonuna ?admin=murat123 yazılınca aktif olur
+# Merve'nin asla görememesi için ÇİFT GÜVENLİK eklendi
 admin_param = st.query_params.get("admin")
 
-if admin_param == GIZLI_ADMIN_SIFRESI:
+# Şifre murat123 OLSA BİLE, login olan kişi Murat DEĞİLSE panel açılmaz!
+if admin_param == GIZLI_ADMIN_SIFRESI and st.session_state.get("current_user") == SENIN_ADIN:
     st.write("---")
     st.subheader("🕵️‍♂️ Gizli Yönetim Paneli")
     
