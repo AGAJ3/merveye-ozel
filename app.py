@@ -126,6 +126,13 @@ if st.session_state.current_user is None:
 
 # --- ANA UYGULAMA ---
 st.sidebar.title(f"Hoş geldin, {st.session_state.current_user}! ✨")
+
+# --- ÖZEL ÇİZİMİ MENÜYE EKLEME ---
+# Resim app.py ile aynı klasörde olmalı
+resim_yolu = "191dea10-640a-4f9e-b91c-e877e30b6b02.jpg"
+if os.path.exists(resim_yolu):
+    st.sidebar.image(resim_yolu, use_container_width=True)
+
 app_modu = st.sidebar.radio("Nereye Gitmek İstersin?", ["💬 Bize Özel (Canlı Sohbet)", "🤖 Sanal Murat (Yapay Zeka)"])
 
 if st.sidebar.button("🚪 Çıkış Yap"):
