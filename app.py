@@ -3,6 +3,7 @@ import google.generativeai as genai
 import datetime
 import os
 import json
+import base64
 
 # --- KULLANICI BİLGİLERİ VE ŞİFRELER ---
 FLORTUN_ADI = "Merve" 
@@ -22,14 +23,46 @@ TURKIYE_SAATI = datetime.timezone(datetime.timedelta(hours=3))
 
 st.set_page_config(page_title="Bize Özel ✨", page_icon="🤫", layout="centered")
 
+# --- RESMİ OKUMA VE BASE64'E ÇEVİRME ---
+resim_yolu = "191dea10-640a-4f9e-b91c-e877e30b6b02.jpg"
+img_base64 = ""
+if os.path.exists(resim_yolu):
+    try:
+        with open(resim_yolu, "rb") as img_file:
+            img_base64 = base64.b64encode(img_file.read()).decode()
+    except Exception:
+        pass
+
+# Ufak emojiler için
+if img_base64:
+    ozel_emoji = f'<img src="data:image/jpeg;base64,{img_base64}" style="width: 40px; height: auto; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0,0,0,0.15); opacity: 0.9;">'
+else:
+    ozel_emoji = "🦄"
+
 # --- ARKA PLAN VE CSS ---
-st.markdown("""
-    <style>
+# Arka plan resmi varsa onu kullan, yoksa eski pembe geçişi kullan
+if img_base64:
+    app_bg = f"""
+    .stApp {{
+        background-image: url("data:image/jpeg;base64,{img_base64}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }}
+    """
+else:
+    app_bg = """
     .stApp {
         background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
         background-attachment: fixed;
     }
-    .stChatMessage {
+    """
+
+css_kodu = f"""
+    <style>
+    {app_bg}
+    
+    .stChatMessage {{
         background-color: rgba(255, 255, 255, 0.90);
         border-radius: 18px;
         padding: 14px;
@@ -37,42 +70,55 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(255, 182, 193, 0.3);
         position: relative;
         z-index: 2;
-    }
-    h1, h2, h3, p, span { color: #4a2e35 !important; }
+    }}
+    h1, h2, h3, p, span {{ color: #4a2e35 !important; }}
 
-    .unicorn-bg {
+    .unicorn-bg {{
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         pointer-events: none; z-index: 0; overflow: hidden;
-    }
-    .particle {
+    }}
+    .particle {{
         position: absolute; bottom: -60px; font-size: 26px;
         animation: floatUp 8s linear infinite; opacity: 0;
-    }
-    .p1  { left: 5%;  animation-duration: 7s;  animation-delay: 0s; }
-    .p2  { left: 20%; animation-duration: 9s;  animation-delay: 1s; }
-    .p3  { left: 35%; animation-duration: 8s;  animation-delay: 3s; }
-    .p4  { left: 50%; animation-duration: 10s; animation-delay: 2s; }
-    .p5  { left: 65%; animation-duration: 7s;  animation-delay: 4s; }
-    .p6  { left: 80%; animation-duration: 9s;  animation-delay: 1.5s; }
-    .p7  { left: 92%; animation-duration: 8s;  animation-delay: 3.5s; }
+    }}
+    .p1  {{ left: 5%;  animation-duration: 7s;  animation-delay: 0s; }}
+    .p2  {{ left: 20%; animation-duration: 9s;  animation-delay: 1s; }}
+    .p3  {{ left: 35%; animation-duration: 8s;  animation-delay: 3s; }}
+    .p4  {{ left: 50%; animation-duration: 10s; animation-delay: 2s; }}
+    .p5  {{ left: 65%; animation-duration: 7s;  animation-delay: 4s; }}
+    .p6  {{ left: 80%; animation-duration: 9s;  animation-delay: 1.5s; }}
+    .p7  {{ left: 92%; animation-duration: 8s;  animation-delay: 3.5s; }}
+    
+    /* Özel Çizim Animasyonları */
+    .p8  {{ left: 12%; animation-duration: 11s; animation-delay: 0.5s; }}
+    .p9  {{ left: 45%; animation-duration: 13s; animation-delay: 2.2s; }}
+    .p10 {{ left: 85%; animation-duration: 10s; animation-delay: 1.8s; }}
 
-    @keyframes floatUp {
-        0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
-        20% { opacity: 0.6; }
-        80% { opacity: 0.6; }
-        100% { transform: translateY(-115vh) rotate(360deg) scale(1.1); opacity: 0; }
-    }
+    @keyframes floatUp {{
+        0% {{ transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }}
+        20% {{ opacity: 0.7; }}
+        80% {{ opacity: 0.7; }}
+        100% {{ transform: translateY(-115vh) rotate(360deg) scale(1.1); opacity: 0; }}
+    }}
     </style>
+"""
+
+html_kodu = f"""
     <div class="unicorn-bg">
         <div class="particle p1">✨</div>
         <div class="particle p2">🔥</div>
         <div class="particle p3">✨</div>
+        <div class="particle p8">{ozel_emoji}</div>
         <div class="particle p4">🥂</div>
+        <div class="particle p9">{ozel_emoji}</div>
         <div class="particle p5">✨</div>
         <div class="particle p6">🔥</div>
+        <div class="particle p10">{ozel_emoji}</div>
         <div class="particle p7">😉</div>
     </div>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(css_kodu + html_kodu, unsafe_allow_html=True)
 
 # --- CİHAZ VE ZİYARETÇİ BİLGİLERİNİ ALMA ---
 try:
@@ -105,7 +151,6 @@ if st.session_state.current_user is None:
     girilen_sifre = st.text_input("Şifre:", type="password")
     
     if st.button("Giriş Yap 🚀"):
-        # Merve için cihaz kontrolü (Sadece iPhone / iOS cihazlardan girmesine izin ver)
         if secilen_kisi == FLORTUN_ADI:
             if "iPhone" not in user_agent and "iPad" not in user_agent:
                 st.error("Bu hesap sadece kayıtlı mobil cihazından erişebilir! 😉")
@@ -115,7 +160,6 @@ if st.session_state.current_user is None:
             else:
                 st.error("Şifre hatalı!")
                 
-        # Murat için normal kontrol (Bilgisayardan veya telefondan girebilir)
         elif secilen_kisi == SENIN_ADIN and girilen_sifre == MURAT_GIRIS_SIFRESI:
             st.session_state.current_user = SENIN_ADIN
             st.rerun()
@@ -127,9 +171,6 @@ if st.session_state.current_user is None:
 # --- ANA UYGULAMA ---
 st.sidebar.title(f"Hoş geldin, {st.session_state.current_user}! ✨")
 
-# --- ÖZEL ÇİZİMİ MENÜYE EKLEME ---
-# Resim app.py ile aynı klasörde olmalı
-resim_yolu = "191dea10-640a-4f9e-b91c-e877e30b6b02.jpg"
 if os.path.exists(resim_yolu):
     st.sidebar.image(resim_yolu, use_container_width=True)
 
